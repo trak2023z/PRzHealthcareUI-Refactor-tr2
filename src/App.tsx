@@ -7,6 +7,8 @@ import { plPL } from "@mui/x-date-pickers/locales";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/pl";
 import { registerLicense } from "@syncfusion/ej2-base";
+import SignUp from "./components/content/SignUp";
+import Dashboard from "./components/content/dashboard/Dashboard";
 
 function App() {
   registerLicense(
@@ -29,18 +31,19 @@ function App() {
                 path="/"
                 element={
                   <PrivateRoute>
-                    <SignIn />
+                    <Dashboard />
                   </PrivateRoute>
                 }
               >
               </Route>
 
               <Route path="/login" element={<SignIn />} />
+              <Route path="/register" element={<SignUp />} />
             </Routes>
           </BrowserRouter>
         </div>
       </SnackbarProvider>
-    </LocalizationProvider>
+      </LocalizationProvider>
   );
 }
 export default App;

@@ -42,3 +42,6 @@ export type UserData = {
 export const loginAccount = (data: LoginData) => {
   return Api.post('/account/login', data);
 };
+export const registerAccount = (data: RegisterData) => {
+    return Api.post('/account/register', data);
+  }

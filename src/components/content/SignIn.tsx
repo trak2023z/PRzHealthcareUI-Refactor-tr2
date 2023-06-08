@@ -132,7 +132,23 @@ export default function SignIn() {
             >
               Zaloguj
             </Button>
-
+            <Stack direction={"column"} spacing={2}>
+              <Stack
+                direction={"row"}
+                spacing={5}
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Button variant="contained" color="success">
+                  <Link
+                    to="/register"
+                    style={{ textDecoration: "none", color: "white" }}
+                  >
+                    Zarejestruj się
+                  </Link>
+                </Button>
+              </Stack>
+            </Stack>
             <Copyright sx={{ mt: 5 }} />
           </Box>
         </Box>

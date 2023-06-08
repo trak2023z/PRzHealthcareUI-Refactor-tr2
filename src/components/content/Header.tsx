@@ -88,27 +88,6 @@ export default function Header() {
           >
             <MenuItem>{localStorage.getItem("name")}</MenuItem>
             <Divider />
-            <MenuItem
-              onClick={() => {
-                navigate("/usersettings");
-                handleCloseMenu();
-              }}
-            >
-              Profil
-            </MenuItem>
-            {localStorage.getItem("atyId") === "4" ? (
-              <MenuItem
-                onClick={() => {
-                  navigate("/globalsettings");
-                  handleCloseMenu();
-                }}
-              >
-                Ustawienia
-              </MenuItem>
-            ) : (
-              <div></div>
-            )}
-
             <MenuItem onClick={logout}>Wyloguj</MenuItem>
           </Menu>
         </IconButton>
