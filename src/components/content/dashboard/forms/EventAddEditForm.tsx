@@ -11,17 +11,17 @@ import { createTheme } from "@mui/material/styles";
 import SaveAsIcon from "@mui/icons-material/SaveAs";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import BlockIcon from "@mui/icons-material/Block";
-import {
-  Container,
-  IconButton,
-  MenuItem,
-  Tooltip,
-} from "@mui/material";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { Container, IconButton, MenuItem, Tooltip } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { UserData } from "../../../../api/ApiAccount";
 import { VaccinationInformation } from "../../../../api/ApiVaccination";
 import { format } from "date-fns";
-import { EventInformation, takeEventTerm } from "../../../../api/ApiEvent";
+import {
+  EventInformation,
+  finishEventTerm,
+  takeEventTerm,
+} from "../../../../api/ApiEvent";
 
 interface EventAddEditFormProps {
   onClose: () => void;
@@ -58,6 +58,8 @@ const EventAddEditForm: React.FC<EventAddEditFormProps> = ({
   const [selectedDoctor, setSelectedDoctor] = useState<String>();
   const [selectedVaccination, setSelectedVaccination] =
     useState<VaccinationInformation>();
+
+  const [canConfirm, setCanConfirm] = useState(false);
 
   let navigate = useNavigate();
   const theme = createTheme();
@@ -122,15 +124,12 @@ const EventAddEditForm: React.FC<EventAddEditFormProps> = ({
   ) => {
     takeEventTerm(data)
       .then((res: any) => {
-        enqueueSnackbar(
-          "Wizyta została zarejestrowana",
-          {
-            anchorOrigin: { vertical: "top", horizontal: "right" },
-            variant: "success",
-            autoHideDuration: 8000,
-            preventDuplicate: true,
-          }
-        );
+        enqueueSnackbar("Wizyta została zarejestrowana", {
+          anchorOrigin: { vertical: "top", horizontal: "right" },
+          variant: "success",
+          autoHideDuration: 8000,
+          preventDuplicate: true,
+        });
       })
       .catch((error: any) => {
         if (error.response.status === 401) {
@@ -170,6 +169,34 @@ const EventAddEditForm: React.FC<EventAddEditFormProps> = ({
         : undefined,
     },
   });
+  const handleFinishTerm = (data: EventInformation | undefined) => {
+    if (data != undefined) {
+      finishEventTerm(data)
+        .then((res: any) => {
+          enqueueSnackbar("Wizyta została zakończona", {
+            anchorOrigin: { vertical: "top", horizontal: "right" },
+            preventDuplicate: true,
+            variant: "success",
+            autoHideDuration: 5000,
+          });
+          if (eventInformation !== undefined) {
+            eventInformation.type = 4;
+          }
+        })
+        .catch((error: any) => {
+          if (error.response.status === 401) {
+            localStorage.clear();
+            navigate("/login");
+          }
+          enqueueSnackbar(error.response.data.message, {
+            anchorOrigin: { vertical: "top", horizontal: "right" },
+            preventDuplicate: true,
+            variant: "error",
+            autoHideDuration: 5000,
+          });
+        });
+    }
+  };
 
   return (
     <Container maxWidth="sm">
@@ -352,7 +379,19 @@ const EventAddEditForm: React.FC<EventAddEditFormProps> = ({
               )}
             />
           )}
-
+          <Stack direction={"column"} spacing={2}>
+            <Button
+              onClick={() => {
+                handleFinishTerm(eventInformation);
+              }}
+              variant="contained"
+              color="info"
+              disabled={eventInformation?.type !== 2}
+              endIcon={<CheckCircleOutlineIcon />}
+            >
+              Potwierdź wizytę
+            </Button>
+          </Stack>
           <Stack
             direction="row"
             spacing={5}

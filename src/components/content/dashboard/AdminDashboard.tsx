@@ -40,6 +40,7 @@ import {
 } from "@syncfusion/ej2-react-schedule";
 import { Ajax, L10n, setCulture, loadCldr } from "@syncfusion/ej2-base";
 import EventAddEditForm from "./forms/EventAddEditForm";
+import { EventInformation, getNurseEvents, getSelectedEvent } from "../../../api/ApiEvent";
 
 loadCldr(
   require("cldr-data/supplemental/numberingSystems.json"),
@@ -159,7 +160,12 @@ export default function DashboardContent() {
   const [mappedEvents, setMappedEvents] = useState<EventMappedInformation[]>(
     []
   );
+  const [doctorEventList, setDoctorEventList] = useState<EventInformation[]>(
+    []
+  );
   const [newEventStart, setNewEventStart] = useState<string>("");
+  const [eventList, setEventList] = useState<EventInformation[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<EventInformation>();
 
   let navigate = useNavigate();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -172,6 +178,24 @@ export default function DashboardContent() {
   const eventSettings: EventSettingsModel = { dataSource: mappedEvents };
 
   useEffect(() => {
+    getNurseEvents(Number(localStorage.getItem("accId")))
+      .then((res: any) => {
+        setEventList(res.data);
+        handleRefreshSchedule(16);
+      })
+      .catch((error: any) => {
+        if (error.response.status === 401) {
+          localStorage.clear();
+          navigate("/login");
+        } else {
+          enqueueSnackbar(error.response.data.message, {
+            anchorOrigin: { vertical: "top", horizontal: "right" },
+            preventDuplicate: true,
+            variant: "error",
+            autoHideDuration: 5000,
+          });
+        }
+      });
     getDoctors()
       .then((res) => {
         setDoctorsList(res.data);
@@ -225,10 +249,47 @@ export default function DashboardContent() {
       });
   }, []);
 
+  function handleRefreshSchedule(doctorId: Number): void {
+    const mappedEventsTemp = eventList
+      .filter((ev) => ev.doctorId === doctorId)
+      .map((event) => ({
+        Id: event.id,
+        StartTime: new Date(event.timeFrom),
+        EndTime: new Date(event.timeTo),
+        Subject: event.description,
+        IsAllDay: false,
+        Color: event.type === 4 ? "#00b33c" : "#4d4dff",
+      }));
+    setMappedEvents(mappedEventsTemp);
+  }
+
   function onPopupOpen(args: PopupOpenEventArgs): void {
     setNewEventStart(args.data?.startTime);
-    setOpenAddEditEventDialog(true);
-    setOpenAddEditEventDialogUndefined(true);
+    if (args.data?.Id !== undefined) {
+      getSelectedEvent(args.data?.Id)
+        .then((res) => {
+          setSelectedEvent(res?.data);
+          setOpenAddEditEventDialog(true);
+        })
+        .catch((error) => {
+          if (error.response.status === 401) {
+            localStorage.clear();
+            navigate("/login");
+          } else {
+            enqueueSnackbar(error.response.data.message, {
+              anchorOrigin: { vertical: "top", horizontal: "right" },
+              preventDuplicate: true,
+              variant: "error",
+              autoHideDuration: 5000,
+            });
+          }
+        });
+    } else {
+      setSelectedEvent(undefined);
+      setOpenAddEditEventDialog(true);
+      setOpenAddEditEventDialogUndefined(true);
+    }
+
     args.cancel = true;
   }
   function onEventRendered(args: any) {
@@ -277,6 +338,12 @@ export default function DashboardContent() {
                           (doc) => doc.id === Number(event.target.value)
                         )[0]
                       );
+                      setDoctorEventList(
+                        eventList.filter(
+                          (ev) => ev.doctorId === Number(event.target.value)
+                        )
+                      );
+                      handleRefreshSchedule(Number(event.target.value));
                     }}
                   >
                     {doctorsList.map((type) => (
@@ -345,6 +412,7 @@ export default function DashboardContent() {
               patientsList={patientsList}
               vaccinationsList={vaccinationList.filter((vac) => vac.isActive)}
               newEventStartTime={newEventStart}
+              eventInformation={selectedEvent}
               newEventDoctor={
                 selectedDoctor !== undefined ? selectedDoctor : undefined
               }
