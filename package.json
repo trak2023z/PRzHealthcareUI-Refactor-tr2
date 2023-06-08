@@ -11,6 +11,7 @@
     "@mui/styled-engine-sc": "^5.12.0",
     "@mui/x-date-pickers": "^6.6.0",
     "@syncfusion/ej2-base": "^21.2.9",
+    "@syncfusion/ej2-react-calendars": "^21.2.9",
     "@syncfusion/ej2-react-schedule": "^21.2.9",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -20,10 +21,13 @@
     "@types/react": "^18.2.9",
     "@types/react-dom": "^18.2.4",
     "axios": "^1.4.0",
+    "cldr-data": "^36.0.1",
     "create-react-class": "^15.7.0",
+    "date-fns": "^2.30.0",
     "dayjs": "^1.11.8",
     "jquery": "^3.7.0",
     "notistack": "^3.0.1",
+    "primeicons": "^6.0.1",
     "primereact": "^9.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -63,6 +67,7 @@
   },
   "devDependencies": {
     "@types/create-react-class": "^15.6.3",
-    "@types/jquery": "^3.5.16"
+    "@types/jquery": "^3.5.16",
+    "systemjs-plugin-json": "^0.3.0"
   }
 }

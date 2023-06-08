@@ -1,4 +1,4 @@
-import Api from './ApiGlobal';
+import Api from "./ApiGlobal";
 
 export type LoginData = {
   login: string;
@@ -22,7 +22,7 @@ export type RegisterData = {
 };
 
 export type UserData = {
-  id: number
+  id: number;
   atyId: number;
   login: string;
   password: string;
@@ -37,11 +37,21 @@ export type UserData = {
   isActive: boolean;
   insertedDate: Date;
   modifiedDate: Date;
-}
+};
 
 export const loginAccount = (data: LoginData) => {
-  return Api.post('/account/login', data);
+  return Api.post("/account/login", data);
 };
 export const registerAccount = (data: RegisterData) => {
-    return Api.post('/account/register', data);
-  }
+  return Api.post("/account/register", data);
+};
+export const getDoctors = () => {
+  return Api.get("/account/getdoctorslist", {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  });
+};
+export const getPatients = () => {
+  return Api.get("/account/getpatientslist", {
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  });
+};
